@@ -6,44 +6,39 @@ import sys
 import zipfile 
 import biplist
 
-# all available attributes
-attributes = {
-    'version':    'CFBundleShortVersionString',
-    'build':      'CFBundleVersion',
-    'identifier': 'CFBundleIdentifier',
-    'name':       'CFBundleDisplayName',
-}
 
-class IPA(object):
-    '''A wrapper of ipa package'''
+def get_info(path, **attrs):
+    '''Get ipa informations
 
+    @param path: ipa file path
+    @param attrs: the attributes na
+    @return: info dictionary
+    '''
+
+    attributes = {
+        'version':    'CFBundleShortVersionString',
+        'build':      'CFBundleVersion',
+        'identifier': 'CFBundleIdentifier',
+        'name':       'CFBundleDisplayName',
+    }
     info_plist_re = re.compile(r'Payload/.*\.app/Info.plist')
 
-    def __init__(self, path):
-        zip_file = zipfile.ZipFile(path)
-        all_files = zip_file.namelist()
+    zip_file = zipfile.ZipFile(path)
+    namelist = zip_file.namelist()
 
-        info = None
-        for f in all_files:
-            if self.info_plist_re.match(f):
-                info = f
-                break
+    info_plist = None
+    for f in namelist:
+        if info_plist_re.match(f):
+            info_plist = f
+            break
+    else:
+        raise NameError('Info.plist not found')
 
-        if not info:
-            raise NameError('Info.plist not found')
+    attributes.update(attrs)
+    plist = biplist.readPlistFromString(zip_file.read(info_plist))
 
-        self.info = biplist.readPlistFromString(zip_file.read(info))
-
-        for attr, name in attributes.items():
-            setattr(self, attr, self.get_attribute(name))
-    
-    def get_attribute(self, attr):
-        '''Get attribute from Info.plist
-        
-        @param attr: attribute name, e.g. "CFBundleIdentifier"
-        '''
-        return self.info.get(attr).encode('utf-8')
-
+    return {k: plist.get(v).encode('utf-8') for k, v in attributes.items()}
+ 
 _manifest_template = '''\
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
