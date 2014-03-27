@@ -2,14 +2,18 @@
 <html lang="zh-cn">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="stylesheet" href="/static/pure-min.css" />
 		<link rel="stylesheet" href="/static/style.css" />
 		<title>Wireless Ad Hoc Distributer</title>
 	</head>
 	<body>
 		<div class="pure-g-r main">
-			<div class="pure-u-1 build">
-				<a class="pure-button" href="itms-services://?action=download-manifest&url={{build.manifest}}">Install</a>
+			<div class="pure-u-1 box">
+				<a href="itms-services://?action=download-manifest&url=http://{{host}}/manifest.plist">
+					<span class="title">{{title}}</span>
+					<span>{{description}}</span>
+				</a>
 			</div>
 		</div>
 	</body>

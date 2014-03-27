@@ -11,27 +11,5 @@
 			<input type="file" name="ipa_file">
 			<button type="submit" class="pure-button pure-button-primary">上传</button>
 		</form>
-		<table class="pure-table pure-table-bordered">
-			<thead>
-				<tr>
-					<th>#</th>
-					<th>Version</th>
-					<th>Build</th>
-					<th>Date</th>
-					<th>Size</th>
-				</tr>
-			</thead>
-			<tbody>
-				{% for a in archives %}
-				<tr>
-					<td>1</td>
-					<td>{{a.version}}</td>
-					<td>{{a.build}}</td>
-					<td>{{a.date.strftime('%Y-%m-%d %H:%M')}}</td>
-					<td>{{a.size}}</td>
-				</tr>
-				{% end %}
-			</tbody>
-		</table>
 	</body>
 </html>
