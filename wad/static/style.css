@@ -1,0 +1,24 @@
+.box {
+	background: #0e90d2;
+	padding: 1em;
+	color: white;
+}
+
+.box a {
+	display: block;
+	text-align: center;
+	text-decoration: none;
+	color: white;
+}
+
+.title {
+	font-size: 3em;
+}
+
+.date {
+	font-size: 1.2em;
+}
+
+.box span {
+	display: block;
+}
