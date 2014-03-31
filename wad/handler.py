@@ -3,16 +3,11 @@
 
 import os
 import tornado.web
+
 from tornado.options import options
 from io import BytesIO
 
-import utils
-from model import Archive
-
-class FakeBuild(object):
-    def __init__(self):
-        self.manifest = 'http://fake.plist'
-        self.name = 'Fake'
+from archive import Archive
 
 class SingleFileHandler(tornado.web.StaticFileHandler):
     def initialize(self, filename):
@@ -24,8 +19,7 @@ class SingleFileHandler(tornado.web.StaticFileHandler):
 
 class AdminHandler(tornado.web.RequestHandler):
     def get(self):
-        archives = Archive.select().order_by(Archive.date.desc())
-        self.render('admin.html', archives=archives)
+        self.render('admin.html')
 
     def post(self):
         file_list = self.request.files.get('ipa_file', [])
@@ -35,26 +29,25 @@ class AdminHandler(tornado.web.RequestHandler):
         content = file_list[0]['body']
 
         try:
-            self.parse_info(content)
+            self.archive = Archive(BytesIO(content))
         except:
             self.write('Error!')
             return
 
+        self.parse_info()
         self.save_archive(content)
         self.generate_manifest()
         self.generate_index()
 
         self.redirect('/admin')
 
-    def parse_info(self, content):
-        '''Parse infomations from ipa file content'''
-
-        info = utils.get_info(BytesIO(content))
+    def parse_info(self):
+        info = self.archive.attributes
 
         info['file_name'] = '{name}_{version}_{build}.ipa'.format(**info)
-        info['archive_url'] = 'archives/' + info['file_name']
+        info['archive_url'] = '{}/archives/{}'.format(options.host, info['file_name'])
         info['title'] = info['name']
-        info['subtitle'] = '{name} {version}'.format(name=info['name'], version=info['version'])
+        info['subtitle'] = '{} {}'.format(info['name'], info['version'])
         
         self.info = info
 
@@ -75,8 +68,8 @@ class AdminHandler(tornado.web.RequestHandler):
         index_path = os.path.join(options.root, 'index.html')
         title = self.info['name']
         description = '{} {}'.format(self.info['version'], self.info['build'])
+        manifest_url = '{}/manifest.plist'.format(options.host)
 
-        html = self.render_string('index.html', host=options.host, title=title, description=description)
+        html = self.render_string('index.html', manifest_url=manifest_url, title=title, description=description)
         with open(index_path, 'w') as f:
-            print 'write'
             f.write(html)

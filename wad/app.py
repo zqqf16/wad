@@ -15,7 +15,7 @@ from handler import *
 define('port', default=8000, help='running port', type=int)
 define('archives', default='archives', help='archives path')
 define('root', default='../example', help='root directory')
-define('host', default='192.168.6.101', help='host address')
+define('host', default='192.168.0.2:8000', help='host address')
 
 class App(tornado.web.Application):
     def __init__(self):
@@ -40,6 +40,10 @@ def main():
     
     #Load config
     tornado.options.parse_command_line()
+
+    if not options.host.startswith('http'):
+        print options.host
+        options.host = 'http://' + options.host
 
     http_server = tornado.httpserver.HTTPServer(App())
     http_server.listen(options.port)
