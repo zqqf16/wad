@@ -1,19 +1,28 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 import re
-import sys
 import zipfile 
 import biplist
 
+from settings import options
+
 class Archive(object):
 
-    # default attributes
-    default_attributes = {
+    # attributes get form plist
+    _base_attrs = {
         'version':    'CFBundleShortVersionString',
         'build':      'CFBundleVersion',
         'identifier': 'CFBundleIdentifier',
         'name':       'CFBundleDisplayName',
+    }
+
+    _external_attrs = {
+        'file_name': '{name}_{version}_{build}.ipa',
+        'url': '{options.host}/archives/{name}_{version}_{build}.ipa',
+        'title': '{name}',
+        'subtitle': '{name} {version}',
     }
 
     _info_plist_re = re.compile(r'Payload/.*\.app/Info.plist')
@@ -22,9 +31,9 @@ class Archive(object):
         '''Init archive from file path'''
 
         self._path = path
-        self.parse_attribute(**attrs)
+        self._parse_attribute(**attrs)
 
-    def parse_attribute(self, **attrs):
+    def _parse_attribute(self, **attrs):
         '''Get ipa informations
 
         @param attrs: the attributes name
@@ -42,7 +51,20 @@ class Archive(object):
         else:
             raise NameError('Info.plist not found')
 
-        self.default_attributes.update(attrs)
+        self._base_attrs.update(attrs)
         plist = biplist.readPlistFromString(zip_file.read(info_plist))
 
-        self.attributes = {k: plist.get(v).encode('utf-8') for k, v in self.default_attributes.items()}
+        encode = lambda x: x.encode('utf-8') if x else ''
+        base = {k: encode(plist.get(v)) for k, v in self._base_attrs.items()}
+        external = {k: v.format(options=options, **base) for k, v in self._external_attrs.items()}
+
+        self.__dict__.update(base, **external)
+
+    def __getattr__(self, name):
+        return self._attrs.get(name, None)
+
+    def generate_index(self):
+        pass
+
+    def generate_manifest(self):
+        pass
