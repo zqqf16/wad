@@ -39,7 +39,8 @@ class AdminHandler(tornado.web.RequestHandler):
         index_generator.generate(archive)
         manifest_generator.generate(archive)
 
-        with open(options.archive_path+archive.file_name, 'wb') as f:
+        dest_path = os.path.join(options.archive_path, archive.file_name)
+        with open(dest_path, 'wb') as f:
             f.write(content)
 
         self.redirect('/admin')

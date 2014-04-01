@@ -32,9 +32,6 @@ class App(tornado.web.Application):
 
 def main():
     
-    # init config
-    settings.init()
-
     http_server = tornado.httpserver.HTTPServer(App())
     http_server.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()
