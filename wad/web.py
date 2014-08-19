@@ -1,40 +1,36 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
+'''Web'''
 
-import tornado.ioloop
-import tornado.web
-import tornado.options
-import tornado.httpserver
+from flask import Flask
 
-import settings
+from db import init_database
 
-from settings import options, template_path, static_path
-from handler import *
+#blueprint
+from admin import admin_app
 
-class App(tornado.web.Application):
-    def __init__(self):
-        handlers = [
-            (r'[/]?', SingleFileHandler, {'filename': 'index.html'}),
-            (r'/manifest.plist', SingleFileHandler, {'filename': 'manifest.plist'}),
 
-            (r'/admin[/]?', AdminHandler),
-            (r'/archives/(.*)', tornado.web.StaticFileHandler, {'path': options.archive_path}),
-        ]
+# default settings
+_UPLOAD_FOLDER = '/var/tmp/'
+_DATABASE_NAME = 'wad.db'
 
-        settings = {
-            'template_path': template_path,
-            'static_path': static_path,
-        }
+app = Flask(__name__)
 
-        tornado.web.Application.__init__(self, handlers, **settings)
+app.config['UPLOAD_FOLDER'] = _UPLOAD_FOLDER
+app.config['DATABASE_NAME'] = _DATABASE_NAME
 
-def main():
-    
-    http_server = tornado.httpserver.HTTPServer(App())
-    http_server.listen(options.port)
-    tornado.ioloop.IOLoop.instance().start()
+@app.route('/')
+def index():
+    '''Index'''
+
+    return 'Hello World'
+
+#register blueprint
+app.register_blueprint(admin_app, url_prefix='/admin')
+
+#init database
+init_database(app.config['DATABASE_NAME'])
 
 if __name__ == '__main__':
-    main()
+    app.run(debug=True)
