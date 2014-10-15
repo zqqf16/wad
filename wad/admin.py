@@ -5,22 +5,23 @@
 
 import os
 
-import plist, db
+import plist
+import db
 
 from io import BytesIO
+from datetime import datetime
 from flask import Blueprint, render_template
 from flask import jsonify, request, current_app, abort
 from werkzeug.utils import secure_filename
 
-__all__ = ['admin_app']
-
-admin_app = Blueprint('admin', __name__) #pylint: disable=C0103
+admin_app = Blueprint('admin', __name__)  # pylint: disable=C0103
 
 @admin_app.route('/')
 def index():
     '''Index'''
 
     return render_template('admin.html')
+
 
 def parse_ipa(file_path):
     '''Parse IPA'''
@@ -32,11 +33,14 @@ def parse_ipa(file_path):
 
     return info
 
+
 def save_to_database(info):
     '''Save ipa info to database'''
 
     archive = db.Archive(**info)
+    archive.date = datetime.now()
     archive.save()
+
 
 @admin_app.route('/upload', methods=['GET', 'POST'])
 def upload():
@@ -51,7 +55,7 @@ def upload():
         if not info:
             return jsonify(error=2, message='Fail to parse IPA file')
 
-        #Save file
+        # Save file
         file_name = secure_filename(ipa.filename)
         ipa.save(os.path.join(current_app.config['UPLOAD_FOLDER'], file_name))
 
@@ -59,17 +63,19 @@ def upload():
 
         save_to_database(info)
 
-    return jsonify(error=0, **info)
+    return jsonify(error=0, info=info)
+
 
 @admin_app.route('/archives')
 def get_all_archives():
     '''Get all archives'''
 
-    #query parameters
+    # query parameters
     identifier = request.args.get('identifier', None)
 
     archives = db.get_archives(identifier=identifier)
     return jsonify(archives=archives)
+
 
 @admin_app.route('/archives/<archive_id>', methods=['GET', 'PUT', 'DELETE'])
 def get_single_archvie(archive_id):
@@ -84,7 +90,7 @@ def get_single_archvie(archive_id):
     elif request.method == 'DELETE':
         archive.delete_instance()
     elif request.method == 'PUT':
-        #publish
+        # publish
         pass
 
     return jsonify(error=0)

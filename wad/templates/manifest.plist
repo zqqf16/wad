@@ -10,7 +10,7 @@
                    <key>kind</key>
                    <string>software-package</string>
                    <key>url</key>
-                   <string>{{ archive.url }}</string>
+                   <string>{{ url(archive.identifier) }}</string>
                 </dict>
 				{% if locals().get('display_image_url', None) %}
                 <dict>
@@ -42,9 +42,9 @@
                <key>kind</key>
                <string>software</string>
                <key>subtitle</key>
-               <string>{{ archive.subtitle }}</string>
+               <string>{{ archive.identifier }}</string>
                <key>title</key>
-               <string>{{ archive.title }}</string>
+               <string>{{ archive.name }}</string>
            </dict>
        </dict>
    </array>

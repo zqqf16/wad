@@ -1,0 +1,45 @@
+.content {
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1em;
+    padding-right: 1em;
+    max-width: 768px;
+}
+
+.header {
+    font-family: "omnes-pro", sans-serif;
+    max-width: 768px;
+    margin: 0 auto;
+    padding: 1em;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.header h1 {
+    font-size: 200%;
+}
+
+.archives table {
+    width: 100%;
+}
+
+h2.subhead {
+    margin: 2em 0 1em 0;
+    font-weight: 300;
+    color: #888;
+    position: relative;
+}
+
+.box {
+    margin-bottom: 20px;
+}
+
+.pure-button {
+    color: white;
+    border-radius: 4px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.pure-button-warning {
+    background: rgb(223, 117, 20);
+}

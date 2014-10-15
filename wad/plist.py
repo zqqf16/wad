@@ -1,11 +1,44 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 '''Plist operation'''
+
+from __future__ import unicode_literals
 
 import re
 import zipfile
 import biplist
+
+def get_plist_from_ipa(path):
+    '''Get plist file from IPA
+
+    @param path: IPA file path
+    @return plist bytes
+    '''
+
+    plist_file_re = re.compile(r'Payload/.*\.app/Info.plist')
+
+    try:
+        ipa = zipfile.ZipFile(path)
+    except:
+        raise IOError('Failed to read IPA file')
+
+    file_list = ipa.namelist()
+
+    plist_path = ""
+    for file_name in file_list:
+        if plist_file_re.match(file_name):
+            plist_path = file_name
+            break
+
+    else:
+        raise NameError('Info.plist not found in this IPA')
+
+    try:
+        plist = ipa.read(plist_path)
+    except:
+        raise IOError('Fail to read plist')
+
+    return plist
 
 def get_info(path):
     '''Get plist file from IPA
@@ -14,35 +47,16 @@ def get_info(path):
     @return {'version': '', 'build': '', 'identifier': '', 'name':''}
     '''
 
-    plist_re = re.compile(r'Payload/.*\.app/Info.plist')
-
     base_attrs = {
-        'version':    'CFBundleShortVersionString',
-        'build':      'CFBundleVersion',
-        'identifier': 'CFBundleIdentifier',
-        'name':       'CFBundleDisplayName',
+        'version':    b'CFBundleShortVersionString',
+        'build':      b'CFBundleVersion',
+        'identifier': b'CFBundleIdentifier',
+        'name':       b'CFBundleDisplayName',
     }
 
     try:
-        ipa = zipfile.ZipFile(path)
-    except:
-        raise IOError('Fail to open IPA file')
-
-    file_list = ipa.namelist()
-
-    plist_path = None
-    for file_name in file_list:
-        if plist_re.match(file_name):
-            plist_path = file_name
-            break
-    else:
-        raise NameError('Info.plist not found')
-
-    try:
-        plist = biplist.readPlistFromString(ipa.read(plist_path))
+        plist = biplist.readPlistFromString(get_plist_from_ipa(path))
     except:
         raise IOError('Fail to read plist')
 
-    encode = lambda x: x.encode('utf-8') if x else ''
-
-    return {k: encode(plist.get(v)) for k, v in base_attrs.items()}
+    return {k: plist.get(v).decode() for k, v in base_attrs.items()} #pylint: disable=E1103

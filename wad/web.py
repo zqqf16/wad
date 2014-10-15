@@ -3,34 +3,52 @@
 
 '''Web'''
 
-from flask import Flask
+import tornado.web
+import tornado.ioloop
 
-from db import init_database
+from tornado.options import options
 
-#blueprint
-from admin import admin_app
+import settings
+import handlers
 
 
-# default settings
-_UPLOAD_FOLDER = '/var/tmp/'
-_DATABASE_NAME = 'wad.db'
+class App(tornado.web.Application):
 
-app = Flask(__name__)
+    '''Web Application'''
 
-app.config['UPLOAD_FOLDER'] = _UPLOAD_FOLDER
-app.config['DATABASE_NAME'] = _DATABASE_NAME
+    def __init__(self):
+        url_handlers = [
+            (r'[/]?', handlers.IndexHandler),
+            (r'/manifest/(.*).plist', handlers.ManifestHandler),
+            (r'/archive/(.*)', tornado.web.StaticFileHandler,
+             {'path': options.archive_path}),
 
-@app.route('/')
-def index():
-    '''Index'''
+            # admin
+            (r'/admin[/]?', handlers.AdminHandler),
+            (r'/admin/upload', handlers.UploadHandler),
+            (r'/admin/delete', handlers.DeleteHandler),
 
-    return 'Hello World'
+            # others
+            (r'.*', handlers.IndexHandler),
+        ]
 
-#register blueprint
-app.register_blueprint(admin_app, url_prefix='/admin')
+        app_settings = {
+            'template_path': settings.TEMPLATE_PATH,
+            'static_path': settings.STATIC_PATH,
+        }
 
-#init database
-init_database(app.config['DATABASE_NAME'])
+        tornado.web.Application.__init__(
+            self, url_handlers, **app_settings)  # pylint: disable=W0142
 
-if __name__ == '__main__':
-    app.run(debug=True)
+
+def main():
+    '''Start web application'''
+
+    settings.init()
+
+    application = App()
+    application.listen(options.port)  # pylint: disable=E1101
+    tornado.ioloop.IOLoop.instance().start()
+
+if __name__ == "__main__":
+    main()

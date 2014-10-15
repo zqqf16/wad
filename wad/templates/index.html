@@ -8,12 +8,20 @@
 		<title>Wireless Ad Hoc Distributer</title>
 	</head>
 	<body>
-		<div class="pure-g-r main">
-			<div class="pure-u-1 box">
-				<a href="itms-services://?action=download-manifest&url={{manifest_url}}">
-					<span class="title">{{archive.title}}</span>
+		<div class="pure-g main">
+		{% set colors = ['blue', 'green', 'red' 'light-blue', 'dark'] %}
+		{% set color_index = -1 %}
+		{% for archive in archives %}
+			{% set color_index += 1 %}
+			<div class="pure-u-1 box {{colors[color_index]}}">
+				<a href="itms-services://?action=download-manifest&url={{url(archive.identifier)}}">
+					<span class="title">{{archive.name}}</span>
 					<span>{{archive.version}} {{archive.build}}</span>
 				</a>
+			</div>
+		{% end %}
+			<div class="pure-u-1 box dark">
+				<a href="/static/ca.cer">安装根证书</a>
 			</div>
 		</div>
 	</body>

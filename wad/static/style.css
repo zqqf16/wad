@@ -22,3 +22,23 @@
 .box span {
 	display: block;
 }
+
+.blue {
+	background: #0e90d2;
+}
+
+.green {
+	background: #1abc9c;
+}
+
+.red {
+	background: #d9534f;
+}
+
+.light-blue {
+	background: #5bc0de;
+}
+
+.dark {
+	background: #34495e;
+}

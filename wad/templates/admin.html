@@ -3,13 +3,46 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 		<link rel="stylesheet" href="/static/pure-min.css" />
-		<link rel="stylesheet" href="/static/style.css" />
-		<title>Wireless Ad Hoc Distributer</title>
+		<link rel="stylesheet" href="/static/admin.css" />
+		<title>Manage Archives</title>
 	</head>
 	<body>
-		<form enctype="multipart/form-data" class="pure-form pure-form-stacked" action="/admin" method="post">
-			<input type="file" name="ipa_file">
-			<button type="submit" class="pure-button pure-button-primary">上传</button>
-		</form>
+		<div class="content">
+			<div class="header box">
+				<h1>Archive Management</h1>
+			</div>
+			<div class="archives box">
+				<h2 class="subhead">All Archives</h2>
+				<table class="pure-table pure-table-striped">
+	    			<thead>
+	        			<tr>
+	            			<th>Name</th>
+	            			<th>Identifier</th>
+	            			<th>Version</th>
+	            			<th>Build</th>
+	            			<th>Operation</th>
+	        			</tr>
+	    			</thead>
+	    			<tbody>
+	    			{% for archive in archives %}
+				        <tr>
+				            <td>{{archive.name}}</td>
+				            <td>{{archive.identifier}}</td>
+				            <td>{{archive.version}}</td>
+				            <td>{{archive.build}}</td>
+				            <td><a class="pure-button pure-button-warning" href="/admin/delete?id={{archive.identifier}}">Delete</a></td>
+				        </tr>
+				    {% end %}
+		        	</tbody>
+		        </table>
+			</div>
+			<div class="upload box">
+				<h2 class="subhead">Upload</h2>
+				<form enctype="multipart/form-data" class="pure-g pure-form pure-form-stacked" action="/admin/upload" method="post">
+					<input class="pure-u-7-8" type="file" name="ipa_file">
+					<button type="submit" class="pure-button pure-button-primary">上传</button>
+				</form>
+			</div>
+		</div>
 	</body>
 </html>
