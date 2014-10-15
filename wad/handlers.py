@@ -31,16 +31,6 @@ def get_ipa_path(identifier):
                         identifier + '.ipa')
 
 
-class SingleFileHandler(tornado.web.StaticFileHandler):
-
-    def initialize(self, filename):
-        super(SingleFileHandler, self).initialize(options.root_path)
-        self.filename = filename
-
-    def get(self):
-        super(SingleFileHandler, self).get(self.filename)
-
-
 class IndexHandler(tornado.web.RequestHandler):  # pylint: disable=R0904
 
     '''Index handler'''
