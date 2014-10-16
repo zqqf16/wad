@@ -31,6 +31,6 @@ def init():
     # update archive path
     if not os.path.isabs(options.archive_path):
         options.archive_path = os.path.join(
-            options.root_path, options.archive_path)
+            os.getcwd(), options.archive_path)
 
 init()
