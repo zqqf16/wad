@@ -37,11 +37,8 @@ class Archive(object):
                    dict_value['build'])
 
     @classmethod
-    def load(cls, force=False):
+    def load(cls):
         '''Load archives from database'''
-
-        if cls._instances != None and not force:
-            return
 
         try:
             with open(cls._database, 'r') as db_file:

@@ -81,6 +81,7 @@ class DeleteHandler(tornado.web.RequestHandler):  # pylint: disable=R0904
             return
 
         model.Archive.delete(identifier)
+        model.Archive.save()
 
         try:
             os.remove(get_ipa_path(identifier))
